@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: GuessGame-svc
+  namespace: lab-demo-ext
+spec:
+  selector:
+    app: GuessGame
+  ports:
+  - port: 8501
+    targetPort: 8501
+    nodePort: 32767
+  type: NodePort

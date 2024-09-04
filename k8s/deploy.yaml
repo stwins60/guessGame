@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: GuessGame
+  namespace: lab-demo-ext
+spec:
+  selector:
+    matchLabels:
+      app: GuessGame
+  template:
+    metadata:
+      labels:
+        app: GuessGame
+    spec:
+      containers:
+      - name: GuessGame
+        image: IMAGE_NAME
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8501
