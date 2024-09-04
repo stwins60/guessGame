@@ -7,10 +7,12 @@ spec:
   selector:
     matchLabels:
       app: GuessGame
+      label: Green
   template:
     metadata:
       labels:
         app: GuessGame
+        label: Green
     spec:
       containers:
       - name: GuessGame

@@ -6,6 +6,7 @@ metadata:
 spec:
   selector:
     app: GuessGame
+    label: Green
   ports:
   - port: 8501
     targetPort: 8501
