@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "idrisniyi94/guess-game:v.0.0-${env.BUILD_NUMBER}-lite"
-        DOCKERHUB_CRENDENTIALS = credentials('f81abbea-2b04-4323-9b98-5964dfd2af75')
+        DOCKERHUB_CREDENTIALS = credentials('f81abbea-2b04-4323-9b98-5964dfd2af75')
     }
 
     stages {
