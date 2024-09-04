@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: GuessGame
+  name: guessing-game
   namespace: lab-demo-ext
 spec:
   selector:
     matchLabels:
-      app: GuessGame
+      app: guessing-game
       label: Green
   template:
     metadata:
       labels:
-        app: GuessGame
+        app: guessing-game
         label: Green
     spec:
       containers:
-      - name: GuessGame
+      - name: guessing-game
         image: IMAGE_NAME
         resources:
           limits:
