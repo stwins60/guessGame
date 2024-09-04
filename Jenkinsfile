@@ -45,6 +45,7 @@ pipeline {
                         withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: '88a9f11c-11e5-4bdb-b3bd-f63dba417648', namespace: '', serverUrl: '']]) {
                             sh "sed -i 's|IMAGE_NAME|$IMAGE_NAME|g' deploy.yaml"
                             sh "kubectl apply -f ."
+                            echo "Deployed.. Check the namespace"
                         }
                     }
                 }
