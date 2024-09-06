@@ -105,7 +105,7 @@ def display_scores():
 
     if results:
         st.markdown("<h2 style='text-align: center;'>Leaderboard</h2>", unsafe_allow_html=True)
-        df = pd.DataFrame(results, columns=["Name", "Score", "Trials Left"])
+        df = pd.DataFrame(results, columns=["Name", "Score", "Trials Left"]).reset_index(drop=True)
         st.table(df)
     else:
         st.markdown("<h2 style='text-align: center;'>No scores available</h2>", unsafe_allow_html=True)
