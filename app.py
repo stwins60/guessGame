@@ -10,7 +10,7 @@ if 'game_over' not in st.session_state:
     st.session_state.game_over = False
 
 # Centered title
-st.markdown("<h1 style='text-align: center;'>GUESSING GAME</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>🎮 GUESSING GAME 🎮</h1>", unsafe_allow_html=True)
 
 # Input field
 input_value = st.text_input(placeholder="Enter number between 1 and 100", label="guessGame", label_visibility="hidden")
