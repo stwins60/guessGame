@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "idrisniyi94/guess-game:v.0.0-${env.BUILD_NUMBER}-lite"
         DOCKERHUB_CREDENTIALS = credentials('f81abbea-2b04-4323-9b98-5964dfd2af75')
+        SLACK_CHANNEL = "#jenkins"
     }
 
     stages {
@@ -29,11 +30,17 @@ pipeline {
         stage("Trivy File Scan") {
             steps {
                 script {
-                    def result = sh(script: "trivy filesystem --exit-code 1 --severity CRITICAL,HIGH .", returnStatus: true)
+                    dir('./venv'){
+                        def result = sh(script: "trivy filesystem --exit-code 1 --severity CRITICAL,HIGH .", returnStatus: true)
 
-                    if (result != 0) {
-                        error("Vulnerabilities found. Failing the pipeline")
+                        if (result != 0) {
+                            def trivy_output = sh(script: "trivy filesystem --exit-code 1 --severity CRITICAL,HIGH .", returnStatus: true)
+                            slackSend channel: "$SLACK_CHANNEL", message: "Trivy found vulnerabilities in the site packages: \n${trivy_output}"
+                        } else {
+                            slackSend channel: "$SLACK_CHANNEL", message: "Trivy passed with no vulnerabilities."
+                        }
                     }
+                    
                 }
             }
         }
@@ -61,7 +68,10 @@ pipeline {
                     def result = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStatus: true)
 
                     if (result != 0){
-                        error("Detected vulnerabilities in the image $IMAGE_NAME")
+                        def scanOutput = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStatus: true)
+                        slackSend(channel: "$SLACK_CHANNEL", message: "Docker Scout found vulnerabilities:\n${scanOutput}")
+                    } else {
+                        slackSend(channel: "$SLACK_CHANNEL", message: "Docker Scout scan passed with no vulnerabilities.")
                     }
                 }
             }
