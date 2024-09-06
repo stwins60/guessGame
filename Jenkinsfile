@@ -31,10 +31,11 @@ pipeline {
             steps {
                 script {
                     dir('./venv'){
+                        def trivy_output = sh(script: "trivy filesystem --exit-code 1 --severity CRITICAL,HIGH .", returnStdout: true).trim()
                         def result = sh(script: "trivy filesystem --exit-code 1 --severity CRITICAL,HIGH .", returnStatus: true)
 
                         if (result != 0) {
-                            def trivy_output = sh(script: "trivy filesystem --exit-code 1 --severity CRITICAL,HIGH .", returnStatus: true)
+                            
                             slackSend channel: "$SLACK_CHANNEL", message: "Trivy found vulnerabilities in the site packages: \n${trivy_output}"
                         } else {
                             slackSend channel: "$SLACK_CHANNEL", message: "Trivy passed with no vulnerabilities."
@@ -65,10 +66,11 @@ pipeline {
                     sh "chmod +x install-scout.sh"
                     sh "./install-scout.sh"
 
+                    def scanOutput = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStdout: true).trim()
                     def result = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStatus: true)
 
                     if (result != 0){
-                        def scanOutput = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStatus: true)
+                        
                         slackSend(channel: "$SLACK_CHANNEL", message: "Docker Scout found vulnerabilities:\n${scanOutput}")
                     } else {
                         slackSend(channel: "$SLACK_CHANNEL", message: "Docker Scout scan passed with no vulnerabilities.")
