@@ -17,6 +17,15 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/stwins60/guessGame.git']])
             }
         }
+        stage("Install Dependencies") {
+            steps {
+                script {
+                    sh "python3 -m venv venv"
+                    sh "source venv/bin/activate"
+                    sh "python3 -m pip install -r requirements.txt --no-cache-dir --break-system-packages"
+                }
+            }
+        }
         stage("Trivy File Scan") {
             steps {
                 script {
@@ -49,7 +58,7 @@ pipeline {
                     sh "chmod +x install-scout.sh"
                     sh "./install-scout.sh"
 
-                    def result = sh(script: "docker scout cves $IMAGE_NAME --exit-code 1 --severity critical,high", returnStatus: true)
+                    def result = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStatus: true)
 
                     if (result != 0){
                         error("Detected vulnerabilities in the image $IMAGE_NAME")
