@@ -17,6 +17,17 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/stwins60/guessGame.git']])
             }
         }
+        stage("Trivy File Scan") {
+            steps {
+                script {
+                    def result = sh(script: "trivy filesystem --exit-code 1 --severity CRITICAL,HIGH .", returnStatus: true)
+
+                    if (result != 0) {
+                        error("Vulnerabilities found. Failing the pipeline")
+                    }
+                }
+            }
+        }
         stage("Docker Login") {
             steps {
                 script {
@@ -28,6 +39,21 @@ pipeline {
             steps {
                 script {
                     sh "docker build -t $IMAGE_NAME ."
+                }
+            }
+        }
+        stage("Docker Scout") {
+            steps {
+                script {
+                    sh "curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh -o install-scout.sh"
+                    sh "chmod +x install-scout.sh"
+                    sh "./install-scout.sh"
+
+                    def result = sh(script: "docker scout cves $IMAGE_NAME --exit-code 1 --severity critical,high", returnStatus: true)
+
+                    if (result != 0){
+                        error("Detected vulnerabilities in the image $IMAGE_NAME")
+                    }
                 }
             }
         }
