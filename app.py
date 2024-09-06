@@ -20,6 +20,8 @@ if 'RAND_INT' not in st.session_state:
     st.session_state.RAND_INT = random.randint(1, 101)
 if 'game_over' not in st.session_state:
     st.session_state.game_over = False
+if 'show_leaderboard' not in st.session_state:
+    st.session_state.show_leaderboard = False
 
 # Centered title
 st.markdown("<h1 style='text-align: center;'>🎮 GUESSING GAME 🎮</h1>", unsafe_allow_html=True)
@@ -85,18 +87,26 @@ def new_game():
     st.session_state.game_over = False
     st.session_state.trial = 5
     st.session_state.RAND_INT = random.randint(1, 101)
+    st.session_state.show_leaderboard = False  # Reset leaderboard view
 
-# Button with on_click function
+# Display guess button only if the game is not over
+if not st.session_state.game_over:
+    if st.button("Guess"):
+        guess()
+
+# Button to start a new game if the game is over
 if st.session_state.game_over:
-    st.button("Guess", disabled=True)
-    if st.button("Start New Game", on_click=new_game):
-        st.experimental_rerun()
-else:
-    st.button("Guess", on_click=guess)
+    if st.button("Start New Game"):
+        new_game()
+        # st.experimental_rerun()
 
 # Display the number of trials left
 st.write(f"You have {st.session_state.trial} trials left.")
 
-# Button to display all user scores
-if st.button("Show Leaderboard" , on_click=display_scores):
-    st.experimental_rerun()
+# Button to toggle leaderboard visibility
+if st.button("Toggle Leaderboard"):
+    st.session_state.show_leaderboard = not st.session_state.show_leaderboard
+
+# Display leaderboard if the button was clicked
+if st.session_state.show_leaderboard:
+    display_scores()
