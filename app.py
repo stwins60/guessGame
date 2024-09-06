@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 import random
 import sqlite3 as sql
@@ -104,7 +105,8 @@ def display_scores():
 
     if results:
         st.markdown("<h2 style='text-align: center;'>Leaderboard</h2>", unsafe_allow_html=True)
-        st.table([{"Name": row[0], "Score": row[1], "Trials Left": row[2]} for row in results])
+        df = pd.DataFrame(results, columns=["Name", "Score", "Trials Left"])
+        st.table(df)
     else:
         st.markdown("<h2 style='text-align: center;'>No scores available</h2>", unsafe_allow_html=True)
 
