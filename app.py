@@ -1,6 +1,7 @@
 import streamlit as st
 import random
 import sqlite3 as sql
+from prometheus_client import start_http_server, Counter, generate_latest
 
 db = sql.connect("guessGame.db")
 c = db.cursor()
@@ -12,6 +13,13 @@ c.execute("""
                 score INTEGER NOT NULL
             )
             """)
+
+start_http_server(8901, addr='0.0.0.0')
+
+TOTAL_GUESSES = Counter('total_guesses', 'Total number of guesses')
+CORRECT_GUESSES = Counter('correct_guesses', 'Total number of correct guesses')
+FAILED_GUESSES = Counter('failed_guesses', 'Total number of failed guesses')
+TOTAL_USERS = Counter('num_of_users', 'Total number of unique users')
 
 # Initialize session state for the random number and trial count
 if 'trial' not in st.session_state:
@@ -29,6 +37,11 @@ st.markdown("<h1 style='text-align: center;'>🎮 GUESSING GAME 🎮</h1>", unsa
 # Input field for the user name
 user = st.text_input("Enter your name")
 
+def register_user():
+    if user and not st.session_state.user_registered:
+        TOTAL_USERS.inc()
+        st.session_state.user_registered = True
+        
 # Input field for the number guess
 input_value = st.text_input(placeholder="Enter number between 1 and 100", label="guessGame", label_visibility="hidden")
 
@@ -56,10 +69,12 @@ def guess():
     else:
         try:
             user_guess = int(input_value)
+            TOTAL_GUESSES.inc()
             if user_guess < 1 or user_guess > 100:
                 st.markdown("<h2 style='text-align: center; color: red;'>Please enter a valid number between 1 and 100</h2>", unsafe_allow_html=True)
             elif user_guess == st.session_state.RAND_INT:
                 st.markdown(f"<h2 style='text-align: center; color: green;'>Congratulations {user}! You guessed the number correctly. It was {st.session_state.RAND_INT}!</h2>", unsafe_allow_html=True)
+                CORRECT_GUESSES.inc()
                 st.session_state.game_over = True
                 
                 # Calculate score based on remaining trials
@@ -72,9 +87,11 @@ def guess():
             elif user_guess < st.session_state.RAND_INT:
                 st.markdown("<h2 style='text-align: center; color: red;'>You guessed low. Please try again!</h2>", unsafe_allow_html=True)
                 st.session_state.trial -= 1
+                FAILED_GUESSES.inc()
             elif user_guess > st.session_state.RAND_INT:
                 st.markdown("<h2 style='text-align: center; color: red;'>You guessed high. Please try again!</h2>", unsafe_allow_html=True)
                 st.session_state.trial -= 1
+                FAILED_GUESSES.inc()
 
             if st.session_state.trial <= 0:
                 st.markdown(f"<h2 style='text-align: center; color: red;'>Game Over! The correct number was {st.session_state.RAND_INT}.</h2>", unsafe_allow_html=True)
@@ -88,6 +105,9 @@ def new_game():
     st.session_state.trial = 5
     st.session_state.RAND_INT = random.randint(1, 100)
     st.session_state.show_leaderboard = False  # Reset leaderboard view
+    st.session_state.user_registered = False  # Reset user registration
+    
+register_user()
 
 # Display guess button only if the game is not over
 if not st.session_state.game_over:
