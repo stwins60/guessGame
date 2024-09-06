@@ -65,7 +65,7 @@ pipeline {
                     sh "chmod +x install-scout.sh"
                     sh "./install-scout.sh"
 
-                    def scanOutput = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStatus: true).trim()
+                    def scanOutput = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStatus: true)
                     def result = sh(script: "docker scout cves $IMAGE_NAME --exit-code --only-severity critical,high", returnStatus: true)
 
                     if (result != 0){
