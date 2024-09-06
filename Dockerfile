@@ -14,6 +14,7 @@ COPY . .
 
 
 EXPOSE 8501
+EXPOSE 8901
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
