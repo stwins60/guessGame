@@ -17,7 +17,7 @@ c.execute("""
 if 'trial' not in st.session_state:
     st.session_state.trial = 5
 if 'RAND_INT' not in st.session_state:
-    st.session_state.RAND_INT = random.randint(1, 101)
+    st.session_state.RAND_INT = random.randint(1, 100)
 if 'game_over' not in st.session_state:
     st.session_state.game_over = False
 if 'show_leaderboard' not in st.session_state:
@@ -86,7 +86,7 @@ def guess():
 def new_game():
     st.session_state.game_over = False
     st.session_state.trial = 5
-    st.session_state.RAND_INT = random.randint(1, 101)
+    st.session_state.RAND_INT = random.randint(1, 100)
     st.session_state.show_leaderboard = False  # Reset leaderboard view
 
 # Display guess button only if the game is not over
